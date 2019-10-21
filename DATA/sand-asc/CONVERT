@@ -1,0 +1,152 @@
+%Tempfile=2
+
+DATA "Sanderson Test Spectra"
+DATA CALIBR01,6000,22NOV89,"162052","Calibration file 1"
+DATA BKG2,"Background Continuum"
+DATA TEST01,"Peak detection test 1"
+DATA TEST02,"Peak detection test 2"
+DATA TEST03,"Peak detection test 3"
+DATA TEST04,"Peak detection test 4"
+DATA TEST05,"Peak detection test 5"
+DATA TEST06,"Peak detection test 6"
+DATA TEST07,"Peak detection test 7"
+DATA TEST08,"Peak detection test 8"
+DATA TEST09,"Peak detection test 9"
+DATA TEST10,"Equal Doublet resolution, Sepn: 1"
+DATA TEST11,"Equal Doublet resolution, Sepn: 2"
+DATA TEST12,"Equal Doublet resolution, Sepn: 3"
+DATA TEST13,"Equal Doublet resolution, Sepn: 4"
+DATA TEST14,"Equal Doublet resolution, Sepn: 5"
+DATA TEST15,"Equal Doublet resolution, Sepn: 6"
+DATA TEST16,"Equal Doublet resolution, Sepn: 7"
+DATA TEST17,"Equal Doublet resolution, Sepn: 8"
+DATA TEST18,"Equal Doublet resolution, Sepn: 9"
+DATA TEST19,"Equal Doublet resolution, Sepn:10"
+DATA TEST20,"Doublet resolution, Ratio 1:1, Sepn: 4"
+DATA TEST21,"Doublet resolution, Ratio 1:0.08, Sepn: 4"
+DATA TEST22,"Doublet resolution, Ratio 1:0.06, Sepn: 4"
+DATA TEST23,"Doublet resolution, Ratio 1:0.04, Sepn: 4"
+DATA TEST24,"Doublet resolution, Ratio 1:0.02, Sepn: 4"
+DATA TEST25,"Doublet resolution, Ratio 0.1:0.01, Sepn: 4"
+DATA TEST26,"Doublet resolution, Ratio 0.1:0.005, Sepn: 4"
+DATA TEST27,"Doublet resolution, Ratio 0.08:0.1, Sepn: 4"
+DATA TEST28,"Doublet resolution, Ratio 0.06:0.1, Sepn: 4"
+DATA TEST29,"Doublet resolution, Ratio 0.04:0.1, Sepn: 4"
+DATA TEST30,"Doublet resolution, Ratio 0.02:0.1, Sepn: 4"
+DATA TEST31,"Doublet resolution, Ratio 0.01:0.1, Sepn: 4"
+DATA TEST32,"Doublet resolution, Ratio 0.005:0.1, Sepn: 4"
+DATA TEST33,"Efficiency test"
+DATA DONE,*
+DATA CALIBR02,4000,15MAY86,"162052","Standard Spectrum for Chernobyl spectrum"
+DATA TEST34,"Chernoby fallout spectrum"
+DATA DONE
+
+MCB%=1:SEGMENT%=1
+SSIZ%=4096:DIM S&(SSIZ%)
+CLS
+READ Det$,F$,RefLT,RefD$,RefT$,Smp$
+ECAL$=MKS$(0.5)
+BIAS$=MKS$(0)
+PWF1$=MKS$(3)
+PWF2$=MLS$(0)
+CALL ReadM2Calibration(BIAS$,ECAL$,PWF1$,PWF2$,Unit$)
+
+READ F$,Smp$
+WHILE F$<>"DONE"
+  OPEN "C:"+F$+".DAT" FOR INPUT AS #1
+  LINE INPUT#1,H$:?H$
+  LT=1000:REM VAL(MID$(H$,25,6)):IF LT=0 THEN LT=RefLT
+  RT=LT
+  SOCD$=MID$(H$,35,2)+MID$(H$,38,3)+MID$(H$,42,2)
+  SOCT$=MID$(H$,45,2)+MID$(H$,48,2)+MID$(H$,51,2)+"  "
+  IF VAL(SOCD$)=0 THEN SOCD$=RefD$
+  IF VAL(SOCT$)=0 THEN SOCT$=RefT$
+  ?"Live Time: "LT
+  ?"Date:      "SOCD$
+  ?"Time:      "SOCT$
+  WHILE NOT EOF(1)
+    FOR L%=0 TO 408
+      LINE INPUT#1,L$
+      FOR C%=0 TO 9
+        S&(L%*10+C%)=VAL(MID$(L$,C%*7+1,7))
+      NEXT C%
+    NEXT L%
+  WEND
+  CLOSE #1
+  CALL SSave(F$)
+  ?F$+" Done":?
+  READ F$,Smp$
+WEND
+?"All done"
+END
+
+SUB SSave(F$)
+  SHARED S&(),SOCT$,SOCD$,Det$,Smp$,RefT$,RefD$,_
+         SEGMENT%,MCB%,SSIZ%,_
+         RT,LT,BIAS$,ECAL$,PWF1$,PWF2$_
+  LOCAL  EOSpectrum&,C%
+
+  EOSpectrum&=SSIZ%*4!+32
+  CLOSE#%Tempfile:OPEN F$+".CHN" FOR BINARY AS %Tempfile
+  '---------- Save Header Information
+  PUT$#%Tempfile,MKI$(-1)+MKI$(MCB%)+MKI$(SEGMENT%)+RIGHT$(SOCT$,2)
+  PUT$#%Tempfile,MKL$(RT*50)+MKL$(LT*50)
+  PUT$#%Tempfile,SOCD$+" "+LEFT$(SOCT$,4)
+  PUT$#%Tempfile,MKI$(0)+MKI$(SSIZ%)
+  '---------- Transfer Spectrum and Save ---------
+  FOR C%=0 TO SSIZ%-1
+      PUT$#%Tempfile,MKL$(S&(C%))
+  NEXT C%
+  '------------ Save Trailer information
+  SEEK#%Tempfile,EOSpectrum&
+  PUT$#%Tempfile,CHR$(155)+CHR$(255)+MKI$(0)+BIAS$+ECAL$+MKL$(0)_
+                +PWF1$+PWF2$+STRING$(8,CHR$(0))
+  SEEK#%Tempfile,EOSpectrum&+256
+  PUT$#%Tempfile,CHR$(LEN(Det$))+FNPad$(Det$,63)
+  SEEK#%Tempfile,EOSpectrum&+320
+  PUT$#%Tempfile,CHR$(LEN(Smp$))+FNPad$(Smp$,63)
+  '------------- Save Ref. Time/Date and Weight in spectrum
+  SEEK#%Tempfile,EOSpectrum&+384
+  PUT$#%Tempfile,FNPad$(RefD$,7)+FNPad$(RefT$,8)
+  SEEK#%Tempfile,EOSpectrum&+390
+  PUT$#%Tempfile,MKS$(1)
+  '------------- Ensure File correct length
+  SEEK#%Tempfile,EOSpectrum&+511
+  PUT$#%Tempfile,CHR$(0)
+  ?"SAVED"
+  SaveExit:
+  CLOSE#%Tempfile
+END SUB
+
+DEF FNPad$(S$,L%)=LEFT$(S$+STRING$(L%," "),L%)
+
+'================= READ CALIBRATION DATA FROM CONFIG.M2====
+SUB ReadM2Calibration(BIAS$,ECAL$,PWF1$,PWF2$,Unit$)
+  SHARED MCB%,SEGMENT%
+  LOCAL Z$
+
+  CLOSE#%Tempfile:OPEN "CONFIG.M2" FOR BINARY AS %Tempfile
+  SEEK#%Tempfile,662+(MCB%-1)*918:GET$#%Tempfile,4,Unit$
+  SEEK#%Tempfile,666+(MCB%-1)*918+(SEGMENT%-1)*4
+      GET$#%Tempfile,4,BIAS$
+  SEEK#%Tempfile,730+(MCB%-1)*918+(SEGMENT%-1)*4
+      GET$#%Tempfile,4,ECAL$
+  SEEK#%Tempfile,794+(MCB%-1)*918+(SEGMENT%-1)*4
+      GET$#%Tempfile,4,PWF1$
+  SEEK#%Tempfile,858+(MCB%-1)*918+(SEGMENT%-1)*4
+      GET$#%Tempfile,4,PWF2$
+  CLOSE#%Tempfile
+END SUB
+'Format of file is:
+'Bytes 0,1 FFF8 flag, Bytes 2,3 number of MCB's
+'Then for each MCB 918 bytes:
+' 2 bytes Module type:
+'   0=913,1=916,2=917 or 918,3-6=1-4 of 919,7=92X (+256 if TRP)
+' 2 bytes module index, 2 bytes SSIZ%, 2 bytes no. segments.
+' 2 bytes 0, 4 bytes ROI flag, 4 bytes channel mask
+'   917,918 are 23 bit modules, others are 31 bit modules.
+' 256 bytes=32*"unknown "
+' 384 bytes of null
+' 4 bytes "unit"         ' 64 bytes=16*BIAS, 64 bytes=16*ECAL, 64 bytes=16*PWF1, 64 bytes=16*PWF2
+'File ends with 4 bytes: 5,0,5,0
+
