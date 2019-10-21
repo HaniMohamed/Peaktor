@@ -1,6 +1,9 @@
 # Peaktor
 JAVAFX-GUI Scientific application. As a part of a Master it helps to perform some calculations and graphs specific to the field of nuclear engineering.
 
+# Download
+You can try this app without the need to install java on your machine. Download from [Release page](https://github.com/HaniMohamed/Peaktor/releases)
+
 # Screnshots
 ![Alt text](screenshots/screenshot02.png)
 ![Alt text](screenshots/screenshot03.png)
