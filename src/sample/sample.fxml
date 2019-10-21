@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Point3D?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+    <children>
+        <MenuBar maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" VBox.vgrow="NEVER">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#openFile" text="Open…" />
+                        <MenuItem mnemonicParsing="false" onAction="#saveReport" text="Save" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" onAction="#exit" text="Quit" />
+                    </items>
+               <accelerator>
+                  <KeyCodeCombination alt="DOWN" code="F" control="UP" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator>
+                </Menu>
+            <Menu mnemonicParsing="false" text="Calibrate">
+               <items>
+                  <MenuItem fx:id="encal" mnemonicParsing="false" onAction="#energyCalDialog" text="Energy" />
+                  <MenuItem fx:id="fwhmcal" mnemonicParsing="false" onAction="#FWHMCalc" text="FWHM" />
+                  <MenuItem fx:id="effcal" mnemonicParsing="false" onAction="#EFFCalc" text="Efficiency" />
+
+               </items>
+               <accelerator>
+                  <KeyCodeCombination alt="DOWN" code="C" control="UP" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator>
+            </Menu>
+
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About Software" />
+                    </items>
+               <accelerator>
+                  <KeyCodeCombination alt="DOWN" code="H" control="UP" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <AnchorPane fx:id="Content" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="570.0" prefWidth="800.0" VBox.vgrow="ALWAYS">
+            <children>
+                <ScrollPane fx:id="mainScrol" layoutX="5.0" layoutY="65.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" style="-fx-background-color: #dedede;">
+                    <content>
+                        <VBox fx:id="mainBox">
+                            <children>
+                        <TitledPane fx:id="title" collapsible="false" text="Plot" VBox.vgrow="ALWAYS">
+                           <content>
+                                      <AnchorPane fx:id="chartsAnchor">
+                                          <children>
+      
+                                                    <LineChart fx:id="lineChart" layoutY="4.0">
+                                                  <xAxis>
+                                                      <NumberAxis fx:id="lineXaxis" side="BOTTOM" />
+                                                  </xAxis>
+                                                  <yAxis>
+                                                      <NumberAxis fx:id="lineYaxis" side="LEFT" />
+                                                  </yAxis>
+                                       <padding>
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                       </padding>
+                                              </LineChart>
+                                          </children>
+                                 <padding>
+                                    <Insets top="10.0" />
+                                 </padding>
+                                      </AnchorPane>
+                           </content>
+                           <graphic>
+                              <ImageView fx:id="enlargIcon" fitHeight="15.0" fitWidth="15.0" onMousePressed="#enlargeChart" pickOnBounds="true" preserveRatio="true" translateX="560.0">
+                                 <image>
+                                    <Image url="@enlarge.png" />
+                                 </image>
+                                 <rotationAxis>
+                                    <Point3D />
+                                 </rotationAxis>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
+                           </graphic>
+                        </TitledPane>
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+                <ScrollPane fx:id="reportParent" fitToHeight="true" fitToWidth="true" layoutX="5.0" layoutY="367.0" style="-fx-background-color: #dedede;">
+                    <content>
+                        <Pane fx:id="bottom">
+                            <children>
+                        <TitledPane fx:id="repPane" collapsible="false" text="Report">
+                           <content>
+                              <TextArea fx:id="report">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </TextArea>
+                           </content>
+                        </TitledPane>
+                        <TitledPane fx:id="orgPane" collapsible="false" text="Original Plot" visible="false">
+                           <content>
+                              <LineChart fx:id="lineChart2">
+                                 <xAxis>
+                                    <NumberAxis fx:id="lineXaxis1" side="BOTTOM" />
+                                 </xAxis>
+                                 <yAxis>
+                                    <NumberAxis fx:id="lineYaxis1" side="LEFT" />
+                                 </yAxis>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </LineChart>
+                           </content>
+                        </TitledPane>
+                            </children>
+                        </Pane>
+                    </content>
+                </ScrollPane>
+            <VBox fx:id="rightBox" layoutX="614.0" prefHeight="366.0" prefWidth="175.0">
+               <children>
+                      <HBox alignment="CENTER" minHeight="40.0" prefHeight="40.0" prefWidth="175.0" style="-fx-background-color: #dedede;">
+                          <children>
+                              <Label text="Details">
+                                  <font>
+                                      <Font name="System Bold" size="16.0" />
+                                  </font>
+                              </Label>
+                          </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                      </HBox>
+                      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="175.0">
+                          <children>
+                              <Label fx:id="tooltip" />
+                          </children>
+                          <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                          </padding>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                      </VBox>
+                      <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="175.0" style="-fx-background-color: #dedede;">
+                          <content>
+                              <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="95.0" prefWidth="170.0">
+                                  <children>
+                                      <Label text="Start point:" textFill="#0f57d3">
+                                          <VBox.margin>
+                                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          </VBox.margin>
+                                      </Label>
+                                      <Label fx:id="startPoint">
+                                          <VBox.margin>
+                                              <Insets left="10.0" top="10.0" />
+                                          </VBox.margin>
+                                      </Label>
+                                  </children>
+                              </VBox>
+                          </content>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                      </ScrollPane>
+                      <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="175.0" style="-fx-background-color: #dedede;">
+                          <content>
+                              <VBox prefHeight="95.0" prefWidth="170.0">
+                                  <children>
+                                      <Label text="End point:" textFill="#0f57d3">
+                                          <VBox.margin>
+                                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                          </VBox.margin>
+                                      </Label>
+                                      <Label fx:id="endPoint">
+                                          <VBox.margin>
+                                              <Insets left="10.0" top="10.0" />
+                                          </VBox.margin>
+                                      </Label>
+                                  </children>
+                              </VBox>
+                          </content>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                      </ScrollPane>
+                      <Label text="Ctrl+R to reset">
+                          <font>
+                              <Font size="8.0" />
+                          </font>
+                      </Label>
+                  <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="reset" mnemonicParsing="false" text="Reset">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets right="5.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="done" mnemonicParsing="false" text="Select Peak">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Button>
+                     </children>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="65.0">
+              <items>
+                  <VBox alignment="CENTER" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#openFile" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView accessibleHelp="Save" accessibleRoleDescription="Save" accessibleText="Save" cache="true" cacheHint="SPEED" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@open.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="open" textAlignment="CENTER">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <VBox alignment="CENTER_LEFT" maxHeight="50.0" maxWidth="80.0" minHeight="50.0" minWidth="80.0" prefHeight="50.0" prefWidth="80.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" maxHeight="22.0" maxWidth="80.0" minHeight="22.0" minWidth="80.0" onMouseClicked="#saveReport" prefHeight="22.0" prefWidth="80.0">
+                           <children>
+                              <ImageView fx:id="save" accessibleHelp="Save" accessibleRoleDescription="Save" accessibleText="Save" cache="true" cacheHint="SPEED" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@saves.png" />
+                                 </image>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
+                              <Label text="save report">
+                                 <font>
+                                    <Font size="8.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets left="3.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" maxHeight="22.0" maxWidth="80.0" minHeight="22.0" minWidth="80.0" onMouseClicked="#print" prefHeight="22.0" prefWidth="80.0">
+                           <children>
+                              <ImageView fx:id="save1" accessibleHelp="Save" accessibleRoleDescription="Save" accessibleText="Save" cache="true" cacheHint="SPEED" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@printer.png" />
+                                 </image>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
+                              <Label text="print report">
+                                 <font>
+                                    <Font size="8.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets left="3.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <VBox.margin>
+                              <Insets top="5.0" />
+                           </VBox.margin>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <SplitPane prefHeight="40.0" prefWidth="2.0" />
+                  <VBox alignment="CENTER" layoutX="10.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#minim" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fx:id="minimize" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@minimizes.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="multi-chart">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="154.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#show" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fx:id="show" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@shows.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="chart/report">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="208.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#result" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fx:id="result" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@results.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="larg-report">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <SplitPane prefHeight="40.0" prefWidth="2.0" />
+                  <VBox fx:id="energyBox" alignment="CENTER" layoutX="262.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#energyCalDialog" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fx:id="img31" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@calibrate.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="Energy">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <VBox fx:id="fwhmBox" alignment="CENTER" layoutX="322.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#FWHMCalc" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fx:id="img311" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@calibrate.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="FWHM">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <VBox fx:id="effBox" alignment="CENTER" layoutX="376.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#EFFCalc" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fx:id="img3112" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@calibrate.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="Efficiency">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <VBox fx:id="radBox" alignment="CENTER" layoutX="430.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#radFactorsCal" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fx:id="img31121" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@calibrate.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="Rad Factors">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <SplitPane prefHeight="40.0" prefWidth="2.0" />
+                  <VBox fx:id="enrgyChartBox" alignment="CENTER" layoutX="544.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#energyChart" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@chart.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="Energy Cal.">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="376.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#runProg" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@run.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="run prog.">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+                  <SplitPane prefHeight="40.0" prefWidth="2.0" />
+                  <VBox alignment="CENTER" layoutX="436.0" layoutY="4.0" maxHeight="65.0" maxWidth="50.0" minHeight="65.0" minWidth="50.0" onMouseClicked="#exit" prefHeight="65.0" prefWidth="50.0">
+                     <children>
+                        <ImageView fx:id="img3111" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@close.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <Label text="close">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                           <padding>
+                              <Insets top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </VBox>
+
+              </items>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </ToolBar>
+            </children>
+        </AnchorPane>
+    </children>
+</VBox>
